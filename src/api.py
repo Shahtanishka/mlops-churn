@@ -40,28 +40,28 @@ def get_model():
 
 # ── Request schema ─────────────────────────────────────────────────────────────
 class CustomerFeatures(BaseModel):
-    gender: str = Field("Male", example="Male")
-    SeniorCitizen: int = Field(0, example=0)
-    Partner: str = Field("Yes", example="Yes")
-    Dependents: str = Field("No", example="No")
-    tenure: int = Field(12, example=12)
+    gender: str
+    SeniorCitizen: int
+    Partner: str
+    Dependents: str
+    tenure: int
 
-    PhoneService: str = Field("Yes", example="Yes")
-    MultipleLines: str = Field("No", example="No")
-    InternetService: str = Field("Fiber optic", example="Fiber optic")
-    OnlineSecurity: str = Field("No", example="No")
-    OnlineBackup: str = Field("No", example="No")
-    DeviceProtection: str = Field("No", example="No")
-    TechSupport: str = Field("No", example="No")
-    StreamingTV: str = Field("No", example="No")
-    StreamingMovies: str = Field("No", example="No")
+    PhoneService: str
+    MultipleLines: str
+    InternetService: str
+    OnlineSecurity: str
+    OnlineBackup: str
+    DeviceProtection: str
+    TechSupport: str
+    StreamingTV: str
+    StreamingMovies: str
 
-    Contract: str = Field("Month-to-month", example="Month-to-month")
-    PaperlessBilling: str = Field("Yes", example="Yes")
-    PaymentMethod: str = Field("Electronic check", example="Electronic check")
+    Contract: str
+    PaperlessBilling: str
+    PaymentMethod: str
 
-    MonthlyCharges: float = Field(70.35, example=70.35)
-    TotalCharges: float = Field(844.2, example=844.2)
+    MonthlyCharges: float
+    TotalCharges: float
 
 
 # ── Response schema ────────────────────────────────────────────────────────────
