@@ -1,10 +1,9 @@
-venv/
+mlruns/
 __pycache__/
 *.pyc
-mlruns/
-models/*.joblib
 data/*.csv
 data/*.tsv
 reports/*.html
 .env
 mlflow.db
+venv/
