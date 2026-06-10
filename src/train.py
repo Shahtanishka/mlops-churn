@@ -3,7 +3,12 @@ src/train.py
 Trains an XGBoost classifier and logs everything to MLflow.
 Run: python src/train.py
 """
+import mlflow
+import pandas as pd
+import numpy as np
 
+# 🔥 ADD THIS LINE HERE
+mlflow.set_tracking_uri("file:./mlruns")
 import mlflow
 import mlflow.sklearn
 import numpy as np
