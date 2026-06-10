@@ -12,7 +12,8 @@ import pandas as pd
 import os
 
 # ── Load model once at startup ─────────────────────────────────────────────────
-MODEL_PATH = os.path.join("models", "pipeline.joblib")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "../models/pipeline.joblib")
 
 app = FastAPI(
     title="Churn Prediction API",
@@ -23,15 +24,15 @@ app = FastAPI(
 pipeline = None
 
 @app.on_event("startup")
-def load_model():
+async def load_model():
     global pipeline
-    if not os.path.exists(MODEL_PATH):
-        raise RuntimeError(
-            f"Model not found at {MODEL_PATH}. Run `python src/train.py` first."
-        )
-    pipeline = joblib.load(MODEL_PATH)
-    print(f"Model loaded from {MODEL_PATH}")
 
+    try:
+        pipeline = joblib.load(MODEL_PATH)
+        print(f"Model loaded from {MODEL_PATH}")
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to load model: {e}")
 
 # ── Request / Response schemas ─────────────────────────────────────────────────
 class CustomerFeatures(BaseModel):
