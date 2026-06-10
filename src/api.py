@@ -4,7 +4,7 @@ FastAPI app that loads the trained pipeline and serves predictions.
 Run: uvicorn src.api:app --reload (from project root)
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel, Field
 import joblib
 import pandas as pd
@@ -20,21 +20,22 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# ── Global model variable ─────────────────────────────────────────────────────
 pipeline = None
 
 
-# ── Load model at startup ──────────────────────────────────────────────────────
-@app.on_event("startup")
-async def load_model():
+# ── Lazy loader (FIX for CI + pytest + FastAPI lifecycle issues) ──────────────
+def get_model():
     global pipeline
 
-    try:
-        pipeline = joblib.load(MODEL_PATH)
-        print(f"Model loaded from {MODEL_PATH}")
+    if pipeline is None:
+        try:
+            pipeline = joblib.load(MODEL_PATH)
+            print(f"Model loaded from {MODEL_PATH}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to load model: {e}")
 
-    except Exception as e:
-        pipeline = None
-        raise RuntimeError(f"Failed to load model: {e}")
+    return pipeline
 
 
 # ── Request schema ─────────────────────────────────────────────────────────────
@@ -83,17 +84,17 @@ def health():
 @app.post("/predict", response_model=PredictionResponse)
 def predict(customer: CustomerFeatures):
 
-    if pipeline is None:
-        raise HTTPException(status_code=503, detail="Model not loaded")
+    # Convert request → DataFrame
+    data = pd.DataFrame([customer.dict()])  # works with pydantic v1
 
-    # Convert input to DataFrame
-    data = pd.DataFrame([customer.dict()])   # SAFE FOR pydantic v1
+    # Load model safely
+    model = get_model()
 
     # Predict
-    pred = int(pipeline.predict(data)[0])
-    prob = float(pipeline.predict_proba(data)[0][1])
+    pred = int(model.predict(data)[0])
+    prob = float(model.predict_proba(data)[0][1])
 
-    # Risk logic
+    # Risk classification
     if prob < 0.35:
         risk = "Low"
     elif prob < 0.65:
